@@ -12,9 +12,7 @@ passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
 exports.getToken = function (user) {
-  return jwt.sign(user, config.secretKey, {
-    expiresIn: 3600,
-  });
+  return jwt.sign(user, config.secretKey, { expiresIn: 3600 });
 };
 
 var opts = {};
@@ -35,5 +33,15 @@ exports.jwtPassport = passport.use(
     });
   })
 );
+
+exports.verifyAdmin = function verifyAdmin(req, res, next) {
+  if (req.user.admin == true) {
+    next();
+  } else {
+    var err = new Error("You are not authenticated!");
+    err.status = 403;
+    return next(err);
+  }
+};
 
 exports.verifyUser = passport.authenticate("jwt", { session: false });
